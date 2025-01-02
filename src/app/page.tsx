@@ -70,7 +70,7 @@ function Content() {
       }
     }
 
-    if (index === -1) return 0;
+    if (index === -1) return [0, 0];
 
     const currentTime = new Date().getTime();
     const dif = currentTime - stored[index].firstTime;
@@ -82,7 +82,7 @@ function Content() {
       done: stored[index].done
     })
 
-    return Number(((stored[index].done / days) * 100).toFixed(2));
+    return [Number(((stored[index].done / days) * 100).toFixed(2)), days];
   }
 
   return (
@@ -125,7 +125,7 @@ function Content() {
             >
               {ct.task.split(":")[0].trim()}
               {ct.task.split(":")[1] && <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{ct.task.split(":")[1].trim()}</span>}
-              <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{getStat(ct.task.split(":")[0].trim())}%</span>
+              <span style={{ backgroundColor: "black"}} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{getStat(ct.task.split(":")[0].trim())[0]}% de {getStat(ct.task.split(":")[0].trim())[1]} dias</span>
               {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
             </div>
           }
