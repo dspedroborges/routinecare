@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react';
-import { BsCaretDown, BsCaretUp, BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsHouse, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
+import { BsCaretDown, BsCaretUp, BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsHouse, BsPencil, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
 import Link from 'next/link';
 
 type Task = { days: string, task: string, done: boolean };
@@ -34,6 +34,7 @@ function Content() {
     const [currentTasks, setCurrentTasks] = useState<Task[]>();
     const [addedClipboard, setAddedClipboard] = useState(false);
     const [showCreateUpdate, setShowCreateUpdate] = useState(false);
+    const [indexUpdate, setIndexUpdate] = useState(-1);
     const [showDelete, setShowDelete] = useState(false);
     const addToClipboard = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -72,7 +73,10 @@ function Content() {
         <main className="p-8">
             <h1 className="text-white text-4xl text-center my-4">Routine Care</h1>
             <div className="flex items-center justify-center gap-4">
-                <BsPlusCircleDotted onClick={() => setShowCreateUpdate(true)} className="text-4xl text-white mb-8 hover:scale-90 cursor-pointer" />
+                <BsPlusCircleDotted onClick={() => {
+                    setIndexUpdate(-1);
+                    setShowCreateUpdate(true);
+                }} className="text-4xl text-white mb-8 hover:scale-90 cursor-pointer" />
                 <Link href={`/?tasks=${getArrToObjUrl()}`}>
                     <BsHouse className="text-4xl text-white mb-8 hover:scale-90 cursor-pointer" />
                 </Link>
@@ -84,24 +88,31 @@ function Content() {
                     >
                         {ct.task}
                         <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl">{ct.days.split(",").map(d => numberToWeekDay(Number(d))).join(", ")}</span>
-                        {
-                            showDelete ? (
-                                <BsTrashFill onClick={(e) => {
-                                    e.stopPropagation();
-                                    setCurrentTasks(currentTasks.toSpliced(i, 1));
-                                    setShowDelete(false);
-                                }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:inline-block text-red-300" />
-                            ) : (
-                                <BsTrash onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowDelete(true);
-                                    setTimeout(() => {
+
+                        <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 gap-2 hidden group-hover:flex">
+                            {
+                                showDelete ? (
+                                    <BsTrashFill onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentTasks(currentTasks.toSpliced(i, 1));
                                         setShowDelete(false);
-                                    }, 3000);
-                                }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:inline-block" />
-                            )
-                        }
-                        <div className="absolute top-1/2 -translate-y-1/2 left-2/3 hidden group-hover:inline-block">
+                                    }} className="hover:scale-110 text-red-300" />
+                                ) : (
+                                    <BsTrash onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowDelete(true);
+                                        setTimeout(() => {
+                                            setShowDelete(false);
+                                        }, 3000);
+                                    }} className="hover:scale-110" />
+                                )
+                            }
+                            <BsPencil onClick={(e) => {
+                                e.stopPropagation();
+                                setIndexUpdate(i);
+                                setShowCreateUpdate(true);
+                            }} className="hover:scale-110" />
+
                             <BsCaretUp onClick={() => {
                                 const copy = JSON.parse(JSON.stringify(currentTasks));
                                 if (i > 0) {
@@ -113,7 +124,7 @@ function Content() {
                             }} className="hover:scale-110" />
                             <BsCaretDown onClick={() => {
                                 const copy = JSON.parse(JSON.stringify(currentTasks));
-                                if (i < currentTasks.length-1) {
+                                if (i < currentTasks.length - 1) {
                                     let tmp = copy[i + 1];
                                     copy[i + 1] = copy[i];
                                     copy[i] = tmp;
@@ -145,6 +156,7 @@ function Content() {
                     <CreateUpdateTask
                         currentTasks={currentTasks || []}
                         setCurrentTasks={setCurrentTasks}
+                        index={indexUpdate !== -1 ? indexUpdate : undefined}
                         setShowCreateUpdate={setShowCreateUpdate}
                     />
                 )
@@ -160,7 +172,7 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
 
         if (!formTask || !handledDays) return;
 
-        if (index) {
+        if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));
             copy[index] = { ...copy[index], days: handledDays, task: formTask };
             setCurrentTasks(copy);
@@ -180,21 +192,21 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
             <form action={handleAction} onClick={(e) => e.stopPropagation()} className="border p-8 text-white rounded-xl">
                 <div>
                     <label htmlFor="task" className="font-bold mb-2 block my-4">Task:</label>
-                    <input type="text" name="task" id="task" className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
+                    <input type="text" name="task" id="task" defaultValue={(index || index === 0) ? currentTasks[index].task : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
                 </div>
                 <div>
                     <label htmlFor="days" className="font-bold mb-2 block my-4">Days:</label>
-                    <Combobox items={["all", "sun", "mon", "tue", "wed", "thu", "fri", "sat"]} name={"days"} id={"days"} />
+                    <Combobox items={["all", "sun", "mon", "tue", "wed", "thu", "fri", "sat"]} prevSelectedItems={(index || index === 0) ? currentTasks[index].days.split(",").map(e => numberToWeekDay(Number(e))) : []} name={"days"} id={"days"} />
                 </div>
-                <button className="w-full p-4 rounded-full bg-purple-900 text-white hover:bg-purple-800 hover:scale-95 mt-4">{index ? "Atualizar" : "Criar"}</button>
+                <button className="w-full p-4 rounded-full bg-purple-900 text-white hover:bg-purple-800 hover:scale-95 mt-4">{(index || index === 0) ? "Atualizar" : "Criar"}</button>
             </form>
         </div>
     )
 }
 
-function Combobox({ items, name, id, onChange }: { items: string[], name: string, id: string, onChange?: Function }) {
+function Combobox({ items, name, id, prevSelectedItems, onChange }: { items: string[], name: string, id: string, prevSelectedItems?: string[], onChange?: Function }) {
     const [options] = useState<string[]>(items);
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>(prevSelectedItems || []);
 
     const handleSelect = (item: string) => {
         if (!selectedItems.includes(item)) {

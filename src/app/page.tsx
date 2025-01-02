@@ -77,7 +77,8 @@ function Content() {
               className={`${ct.done ? "bg-purple-900" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group`}
               onClick={() => toggleTaskDone(i)}
             >
-              {ct.task}
+              {ct.task.split(":")[0]}
+              { ct.task.split(":")[1] && <span style={{backgroundColor: ct.task.split(":")[2] || "indigo"}} className={`px-2 py-1 mx-4 text-xs rounded-xl`}>{ct.task.split(":")[1]}</span>}
               {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
             </div>
           }
