@@ -125,7 +125,7 @@ function Content() {
             >
               {ct.task.split(":")[0].trim()}
               {ct.task.split(":")[1] && <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{ct.task.split(":")[1].trim()}</span>}
-              <span style={{ backgroundColor: "black"}} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{getStat(ct.task.split(":")[0].trim())[0]}% de {getStat(ct.task.split(":")[0].trim())[1]} dias</span>
+              <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl border opacity-0 group-hover:opacity-100">{getStat(ct.task.split(":")[0].trim())[0]}% de {getStat(ct.task.split(":")[0].trim())[1]} dias</span>
               {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
             </div>
           }
