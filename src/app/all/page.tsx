@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react';
-import { BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsHouse, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
+import { BsCaretDown, BsCaretUp, BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsHouse, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
 import Link from 'next/link';
 
 type Task = { days: string, task: string, done: boolean };
@@ -83,7 +83,7 @@ function Content() {
                         className={`${ct.done ? "bg-purple-900" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group`}
                     >
                         {ct.task}
-                        <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl">{ct.days.split(",").map(d => numberToWeekDay(Number(d))).join(", ") }</span>
+                        <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl">{ct.days.split(",").map(d => numberToWeekDay(Number(d))).join(", ")}</span>
                         {
                             showDelete ? (
                                 <BsTrashFill onClick={(e) => {
@@ -101,6 +101,26 @@ function Content() {
                                 }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:inline-block" />
                             )
                         }
+                        <div className="absolute top-1/2 -translate-y-1/2 left-2/3 hidden group-hover:inline-block">
+                            <BsCaretUp onClick={() => {
+                                const copy = JSON.parse(JSON.stringify(currentTasks));
+                                if (i > 0) {
+                                    let tmp = copy[i - 1];
+                                    copy[i - 1] = copy[i];
+                                    copy[i] = tmp;
+                                }
+                                setCurrentTasks(copy);
+                            }} className="hover:scale-110" />
+                            <BsCaretDown onClick={() => {
+                                const copy = JSON.parse(JSON.stringify(currentTasks));
+                                if (i < currentTasks.length-1) {
+                                    let tmp = copy[i + 1];
+                                    copy[i + 1] = copy[i];
+                                    copy[i] = tmp;
+                                }
+                                setCurrentTasks(copy);
+                            }} className="hover:scale-110" />
+                        </div>
                         {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
                     </div>
                 })
