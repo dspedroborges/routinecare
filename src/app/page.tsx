@@ -10,7 +10,7 @@ type Task = { days: string, task: string, done: boolean };
 export default function Home() {
   return (
     <Suspense>
-      <Content/>
+      <Content />
     </Suspense>
   )
 }
@@ -32,7 +32,7 @@ function Content() {
         const [days, task, done] = a.split(";");
         return { days: days, task, done: done == "true" };
       });
-      console.log({allInObject})
+      console.log({ allInObject })
       setCurrentTasks(allInObject)
     }
   }, []);
@@ -60,6 +60,31 @@ function Content() {
     setCurrentTasks(copy);
   }
 
+  const getStat = (name: string) => {
+    let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
+    let index = -1;
+    for (let k = 0; k < stored.length; k++) {
+      if (stored[k].name === name) {
+        index = k;
+        break;
+      }
+    }
+
+    if (index === -1) return 0;
+
+    const currentTime = new Date().getTime();
+    const dif = currentTime - stored[index].firstTime;
+    const days = Math.ceil(dif / 1000 / 60 / 60 / 24);
+
+    console.log({
+      dif,
+      days,
+      done: stored[index].done
+    })
+
+    return Number(((stored[index].done / days) * 100).toFixed(2));
+  }
+
   return (
     <main className="p-8">
       <h1 className="text-white text-4xl text-center my-4">Routine Care</h1>
@@ -75,10 +100,32 @@ function Content() {
             return <div
               key={i}
               className={`${ct.done ? "bg-purple-950" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group`}
-              onClick={() => toggleTaskDone(i)}
+              onClick={() => {
+                let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
+                let index = -1;
+                for (let k = 0; k < stored.length; k++) {
+                  if (stored[k].name === ct.task.split(":")[0].trim()) {
+                    index = k;
+                    break;
+                  }
+                }
+                if (index == -1) {
+                  stored.push({
+                    name: ct.task.split(":")[0].trim(),
+                    firstTime: new Date().getTime(),
+                    done: !ct.done ? 1 : 0
+                  });
+
+                } else {
+                  stored[index] = { ...stored[index], done: !ct.done ? stored[index].done + 1 : stored[index].done - 1 }
+                }
+                localStorage.setItem("stored", JSON.stringify(stored));
+                toggleTaskDone(i);
+              }}
             >
               {ct.task.split(":")[0].trim()}
-              { ct.task.split(":")[1] && <span style={{backgroundColor: ct.task.split(":")[2] || "indigo"}} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{ct.task.split(":")[1].trim()}</span>}
+              {ct.task.split(":")[1] && <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{ct.task.split(":")[1].trim()}</span>}
+              <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{getStat(ct.task)}%</span>
               {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
             </div>
           }
