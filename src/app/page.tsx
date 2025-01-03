@@ -73,10 +73,14 @@ function Content() {
     if (index === -1) return [0, 0];
 
     const currentTime = new Date().getTime();
+    const splittedDays = stored[index].days.split(",");
+    const multiplier = splittedDays.includes("-1") ? 1 : 7 - splittedDays.length;
     const dif = currentTime - stored[index].firstTime;
-    const days = Math.ceil(dif / 1000 / 60 / 60 / 12);
+    const days = Math.ceil(dif / 1000 / 60 / 60 / 12) * multiplier;
 
     console.log({
+      name: stored[index].name,
+      multiplier,
       preMath: dif / 1000 / 60 / 60 / 12,
       dif,
       days,
@@ -117,11 +121,16 @@ function Content() {
                   stored.push({
                     name: ct.task.split(":")[0].trim(),
                     firstTime: new Date().getTime(),
-                    done: !ct.done ? 1 : 0
+                    done: !ct.done ? 1 : 0,
+                    days: ct.days
                   });
 
                 } else {
-                  stored[index] = { ...stored[index], done: !ct.done ? stored[index].done + 1 : stored[index].done - 1 }
+                  if (!stored[index].days) {
+                    stored[index] = { ...stored[index], done: !ct.done ? stored[index].done + 1 : stored[index].done - 1, days: ct.days }
+                  } else {
+                    stored[index] = { ...stored[index], done: !ct.done ? stored[index].done + 1 : stored[index].done - 1 }
+                  }
                 }
                 localStorage.setItem("stored", JSON.stringify(stored));
                 toggleTaskDone(i);
