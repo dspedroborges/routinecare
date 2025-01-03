@@ -93,11 +93,7 @@ function Content() {
 
     console.log({
       name: stored[index].name,
-      realTotalDays,
-      preMath: dif / 1000 / 60 / 60 / 12,
-      dif,
-      days,
-      splittedDays,
+      realTotalDays: [realTotalDays, days * waitingFactor],
       done: stored[index].done,
       perc
     })
