@@ -119,6 +119,10 @@ function Content() {
                                     let tmp = copy[i - 1];
                                     copy[i - 1] = copy[i];
                                     copy[i] = tmp;
+                                } else {
+                                    let tmp = copy[copy.length-1];
+                                    copy[copy.length-1] = copy[i];
+                                    copy[i] = tmp;
                                 }
                                 setCurrentTasks(copy);
                             }} className="hover:scale-110" />
@@ -127,6 +131,10 @@ function Content() {
                                 if (i < currentTasks.length - 1) {
                                     let tmp = copy[i + 1];
                                     copy[i + 1] = copy[i];
+                                    copy[i] = tmp;
+                                } else {
+                                    let tmp = copy[0];
+                                    copy[0] = copy[i];
                                     copy[i] = tmp;
                                 }
                                 setCurrentTasks(copy);
@@ -174,7 +182,7 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
 
         if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));
-            copy[index] = { ...copy[index], days: handledDays, task: formTask };
+            copy[index] = { days: handledDays, task: formTask, ...copy[index] };
             setCurrentTasks(copy);
         } else {
             const newTaskData = {
@@ -182,7 +190,7 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
                 task: formTask,
                 done: false,
             }
-            setCurrentTasks([...currentTasks, newTaskData]);
+            setCurrentTasks([newTaskData, ...currentTasks]);
         }
         setShowCreateUpdate(false);
     }
