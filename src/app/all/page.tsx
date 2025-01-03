@@ -84,7 +84,7 @@ function Content() {
                 currentTasks?.map((ct, i) => {
                     return <div
                         key={i}
-                        className={`${ct.done ? "bg-purple-900" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group`}
+                        className="bg-gray-800 text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group"
                     >
                         {ct.task}
                         <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl">{ct.days.split(",").map(d => numberToWeekDay(Number(d))).join(", ")}</span>
