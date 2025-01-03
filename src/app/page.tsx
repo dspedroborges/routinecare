@@ -86,6 +86,7 @@ function Content() {
       preMath: dif / 1000 / 60 / 60 / 12,
       dif,
       days,
+      splittedDays,
       done: stored[index].done,
       perc
     })
