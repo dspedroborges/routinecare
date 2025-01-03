@@ -190,7 +190,7 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
 
         if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));
-            copy[index] = { days: handledDays, task: formTask, ...copy[index] };
+            copy[index] = { ...copy[index], days: handledDays, task: formTask };
             setCurrentTasks(copy);
         } else {
             const newTaskData = {
