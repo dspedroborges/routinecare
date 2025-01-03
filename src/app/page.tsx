@@ -117,7 +117,7 @@ function Content() {
           if (ct.days === "-1" || ct.days.split(",").includes(String(currentDay))) {
             return <div
               key={i}
-              className={`${ct.done ? "bg-purple-800" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group shadow shadow-white`}
+              className={`${ct.done ? "bg-purple-800" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group shadow-sm shadow-white`}
               onClick={() => {
                 let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
                 let index = -1;
