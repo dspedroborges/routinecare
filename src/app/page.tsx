@@ -79,6 +79,7 @@ function Content() {
     const days = Math.ceil(dif / 1000 / 60 / 60 / 12);
 
     let perc = Number(((stored[index].done / days) * 100).toFixed(2)) * multiplier;
+    let divDays = Math.ceil(days / multiplier);
 
     console.log({
       name: stored[index].name,
@@ -86,6 +87,7 @@ function Content() {
       preMath: dif / 1000 / 60 / 60 / 12,
       dif,
       days,
+      divDays,
       splittedDays,
       done: stored[index].done,
       perc
@@ -93,7 +95,7 @@ function Content() {
 
     perc = perc > 100 ? 100 : perc;
 
-    return [perc, days];
+    return [perc, divDays];
   }
 
   return (
