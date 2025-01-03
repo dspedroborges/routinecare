@@ -74,10 +74,10 @@ function Content() {
 
     const currentTime = new Date().getTime();
     const dif = currentTime - stored[index].firstTime;
-    
-    const days = Math.ceil(dif / 1000 / 60 / 60 / 24);
-    console.log({ preMath: dif / 1000 / 60 / 60 / 24, days })
+    const days = Math.ceil(dif / 1000 / 60 / 60 / 12);
+
     console.log({
+      preMath: dif / 1000 / 60 / 60 / 12,
       dif,
       days,
       done: stored[index].done
