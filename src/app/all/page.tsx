@@ -48,9 +48,11 @@ function Content() {
                 const [days, task, done] = a.split(";");
                 return { days: days, task, done: done == "true" };
             });
-            setCurrentTasks(allInObject)
+            setCurrentTasks(allInObject);
         }
     }, []);
+
+    console.log(currentTasks);
 
     const getArrToObjUrl = () => {
         if (!currentTasks) return "";
@@ -66,7 +68,9 @@ function Content() {
     }
 
     useEffect(() => {
-        if (currentTasks && tasks) router.push(`?tasks=${getArrToObjUrl()}`);
+        console.log("Gonna push this: ");
+        console.log(currentTasks);
+        if (currentTasks) router.push(`?tasks=${getArrToObjUrl()}`);
     }, [currentTasks]);
 
     return (
@@ -179,6 +183,10 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
         let handledDays = (formData.get("days") as string).replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
 
         if (!formTask || !handledDays) return;
+
+        console.log({
+            formTask,
+        })
 
         if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));

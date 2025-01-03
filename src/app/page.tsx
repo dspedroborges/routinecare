@@ -51,7 +51,7 @@ function Content() {
   }
 
   useEffect(() => {
-    if (currentTasks && tasks) router.push(`?tasks=${getArrToObjUrl()}`);
+    if (currentTasks) router.push(`?tasks=${getArrToObjUrl()}`);
   }, [currentTasks]);
 
   const toggleTaskDone = (index: number) => {
@@ -117,7 +117,7 @@ function Content() {
           if (ct.days === "-1" || ct.days.split(",").includes(String(currentDay))) {
             return <div
               key={i}
-              className={`${ct.done ? "bg-purple-800" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group border`}
+              className={`${ct.done ? "bg-purple-800" : "bg-gray-800"} text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group shadow shadow-white`}
               onClick={() => {
                 let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
                 let index = -1;
@@ -149,7 +149,7 @@ function Content() {
 
                   {
                     ct.done && ct.task.split(":")[3] && (
-                      <span className="px-2 py-1 mx-4 text-xs rounded-xl border bg-red-800">{ct.task.split(":")[3].trim()}</span>
+                      <span className="px-2 py-1 mx-4 text-xs rounded-xl border border-dashed bg-gradient-to-r from-green-800 to-green-950 animate-pulse">Reward: {ct.task.split(":")[3].trim()}</span>
                     )
                   }
                 </>
