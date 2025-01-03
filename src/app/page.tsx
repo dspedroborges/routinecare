@@ -74,20 +74,29 @@ function Content() {
 
     const currentTime = new Date().getTime();
     const splittedDays = stored[index].days.split(",");
-    const multiplier = splittedDays.includes("-1") ? 1 : 7 - splittedDays.length;
     const dif = currentTime - stored[index].firstTime;
     const days = Math.ceil(dif / 1000 / 60 / 60 / 12);
+    
+    // O total de dias é calculado a partir do momento em que o usuário começa a fazer; existe uma variável chamada firstTime que armazena o momento exato em que ele começou. Se é uma atividade que o usuário faz todos os dias, então o total é momentoAtual - momentoDeInicio e o total de vezes feitas deve ser igual ao total de dias transcorridos. Mas e se é algo que ele faz somente 2 vezes na semana?
 
-    let perc = Number(((stored[index].done / days) * 100).toFixed(2)) * multiplier;
-    let divDays = Math.ceil(days / multiplier);
+    // Supondo que é algo feito somente 2 vezes na semana e o total de dias transcorridos foi 10, a pergunta que deve ser respondida é quanto do total desses dias o usuário deveria der cumprido a tarefa, porque esse é o total pro cálculo da porcentagem
+
+    // Existe um intervalo de espera entre uma atividade e outra. Se o usuário faz uma atividade todos os dias, isso quer dizer que o intervalo de espera para a próxima é de 1 dia, ou seja há a relação 7 => 1, então, pela regra de 3, calcula-se esse intervalo de espera com x/7, onde x é a quantidade de vezes que o usuário faz algo na semana
+
+    const amountPerWeek = splittedDays.includes("-1") ? 7 : splittedDays.length;
+    const waitingFactor = amountPerWeek/7;
+
+    // assim, o total real de dias deve ser:
+    const realTotalDays = Math.ceil(days * waitingFactor);
+    // e o percentual fica:
+    let perc = Number(((stored[index].done / realTotalDays) * 100).toFixed(2));
 
     console.log({
       name: stored[index].name,
-      multiplier,
+      realTotalDays,
       preMath: dif / 1000 / 60 / 60 / 12,
       dif,
       days,
-      divDays,
       splittedDays,
       done: stored[index].done,
       perc
@@ -95,7 +104,7 @@ function Content() {
 
     perc = perc > 100 ? 100 : perc;
 
-    return [perc, divDays];
+    return [perc, realTotalDays];
   }
 
   return (
