@@ -74,15 +74,19 @@ function Content() {
 
     const currentTime = new Date().getTime();
     const dif = currentTime - stored[index].firstTime;
+    
     const days = Math.ceil(dif / 1000 / 60 / 60 / 24);
-
+    console.log({ preMath: dif / 1000 / 60 / 60 / 24, days })
     console.log({
       dif,
       days,
       done: stored[index].done
     })
 
-    return [Number(((stored[index].done / days) * 100).toFixed(2)), days];
+    let perc = Number(((stored[index].done / days) * 100).toFixed(2));
+    perc = perc > 100 ? 100 : perc;
+
+    return [perc, days];
   }
 
   return (
