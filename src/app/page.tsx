@@ -35,6 +35,17 @@ function Content() {
       console.log({ allInObject })
       setCurrentTasks(allInObject)
     }
+
+    const lastUsage = localStorage.getItem("lastUsage");
+    if (lastUsage) {
+      const currentDay = new Date().toLocaleDateString();
+      if (currentDay !== lastUsage) {
+        localStorage.setItem("lastUsage", new Date().toLocaleDateString());
+        router.push(`?tasks=${getArrToObjUrl().replaceAll("true", "false")}`);
+      }
+    } else {
+      localStorage.setItem("lastUsage", new Date().toLocaleDateString());
+    }
   }, []);
 
   const getArrToObjUrl = () => {
