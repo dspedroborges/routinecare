@@ -86,7 +86,7 @@ function Content() {
     const currentTime = new Date().getTime();
     const splittedDays = stored[index].days.split(",");
     const dif = currentTime - stored[index].firstTime;
-    const days = Math.ceil(dif / 1000 / 60 / 60 / 16);
+    const days = Math.ceil(dif / 1000 / 60 / 60 / 24);
     
     // O total de dias é calculado a partir do momento em que o usuário começa a fazer; existe uma variável chamada firstTime que armazena o momento exato em que ele começou. Se é uma atividade que o usuário faz todos os dias, então o total é momentoAtual - momentoDeInicio e o total de vezes feitas deve ser igual ao total de dias transcorridos. Mas e se é algo que ele faz somente 2 vezes na semana?
 
