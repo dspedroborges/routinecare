@@ -33,6 +33,20 @@ function Content() {
         return { days: days, task, done: done == "true" };
       });
       console.log({ allInObject })
+
+      let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
+      if (stored.length === 0) {
+        let toBeStored = [];
+        for (let i = 0; i < allInObject.length; i++) {
+          toBeStored.push({
+            name: allInObject[i].task.split(":")[0].trim(),
+            firstTime: new Date().getTime(),
+            done: 0,
+            days: allInObject[i].days
+          });
+        }
+        localStorage.setItem("stored", JSON.stringify(stored));
+      }
       setCurrentTasks(allInObject)
     }
 
@@ -87,7 +101,7 @@ function Content() {
     const splittedDays = stored[index].days.split(",");
     const dif = currentTime - stored[index].firstTime;
     const days = Math.ceil(dif / 1000 / 60 / 60 / 24);
-    
+
     // O total de dias é calculado a partir do momento em que o usuário começa a fazer; existe uma variável chamada firstTime que armazena o momento exato em que ele começou. Se é uma atividade que o usuário faz todos os dias, então o total é momentoAtual - momentoDeInicio e o total de vezes feitas deve ser igual ao total de dias transcorridos. Mas e se é algo que ele faz somente 2 vezes na semana?
 
     // Supondo que é algo feito somente 2 vezes na semana e o total de dias transcorridos foi 10, a pergunta que deve ser respondida é quanto do total desses dias o usuário deveria der cumprido a tarefa, porque esse é o total pro cálculo da porcentagem
@@ -95,7 +109,7 @@ function Content() {
     // Existe um intervalo de espera entre uma atividade e outra. Se o usuário faz uma atividade todos os dias, isso quer dizer que o intervalo de espera para a próxima é de 1 dia, ou seja há a relação 7 => 1, então, pela regra de 3, calcula-se esse intervalo de espera com x/7, onde x é a quantidade de vezes que o usuário faz algo na semana
 
     const amountPerWeek = splittedDays.includes("-1") ? 7 : splittedDays.length;
-    const waitingFactor = amountPerWeek/7;
+    const waitingFactor = amountPerWeek / 7;
 
     // assim, o total real de dias deve ser:
     const realTotalDays = Math.ceil(days * waitingFactor);
@@ -145,7 +159,6 @@ function Content() {
                     done: !ct.done ? 1 : 0,
                     days: ct.days
                   });
-
                 } else {
                   stored[index] = { ...stored[index], done: !ct.done ? stored[index].done + 1 : stored[index].done - 1 }
                 }
@@ -154,7 +167,7 @@ function Content() {
               }}
             >
               {ct.task.split(":")[0].trim()}
-              {ct.task.split(":")[1] && 
+              {ct.task.split(":")[1] &&
                 <>
                   <span style={{ backgroundColor: ct.task.split(":")[2] || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{ct.task.split(":")[1].trim()}</span>
 
@@ -164,7 +177,7 @@ function Content() {
                     )
                   }
                 </>
-                
+
               }
               <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl border opacity-0 group-hover:opacity-100">{getStat(ct.task.split(":")[0].trim())[0]}% from {getStat(ct.task.split(":")[0].trim())[1]} day(s)</span>
               {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
