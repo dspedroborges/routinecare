@@ -35,7 +35,8 @@ function Content() {
       console.log({ allInObject })
 
       let stored = JSON.parse(localStorage.getItem("stored") as string) || [];
-      if (stored.length === 0) {
+      console.log({ stored });
+      if (stored.length === 0 || !stored) {
         let toBeStored = [];
         for (let i = 0; i < allInObject.length; i++) {
           toBeStored.push({
@@ -45,7 +46,7 @@ function Content() {
             days: allInObject[i].days
           });
         }
-        localStorage.setItem("stored", JSON.stringify(stored));
+        localStorage.setItem("stored", JSON.stringify(toBeStored));
       }
       setCurrentTasks(allInObject)
     }
