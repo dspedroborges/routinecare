@@ -34,8 +34,9 @@ function Content() {
         return { days: days, task, done: done == "true" };
       });
       setCurrentTasks(allInObject);
+    } else {
+      localStorage.removeItem("streaks");
     }
-    
     let streaks: string[] = JSON.parse(localStorage.getItem("streaks") as string) || [];
     setRegisteredStreaks(streaks);
   }, []);
@@ -90,7 +91,7 @@ function Content() {
           <BsPencil className="text-4xl text-white mb-8 hover:scale-90 cursor-pointer" />
         </Link>
       </div>
-      <div className="grid grid-cols-7 gap-2 place-content-center my-4">
+      <div className="flex items-center gap-2 justify-center">
         {
           registeredStreaks.map((r, i) => {
             return <BsFire key={i} title={r} className="text-red-600 text-xl animate-pulse"/>
