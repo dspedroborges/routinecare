@@ -111,10 +111,10 @@ function Content() {
               {
                 ct.task.split(":").map((s, i) => {
                   if (i === 0) {
-                    return <span key={i}>{s}</span>;
+                    return <span className="mr-4" key={i}>{s}</span>;
                   } else {
                     const [title, color] = s.split("@");
-                    return  <span  key={i} style={{ backgroundColor: color || "indigo" }} className={`px-2 py-1 mx-4 text-xs rounded-xl border`}>{title}</span>;
+                    return  <span  key={i} style={{ backgroundColor: color || "indigo" }} className={`px-2 py-1 mx-1 text-xs rounded-xl border`}>{title}</span>;
                   }
                 })
               }

@@ -52,7 +52,6 @@ function Content() {
         }
     }, []);
 
-    console.log(currentTasks);
 
     const getArrToObjUrl = () => {
         if (!currentTasks) return "";
@@ -68,8 +67,6 @@ function Content() {
     }
 
     useEffect(() => {
-        console.log("Gonna push this: ");
-        console.log(currentTasks);
         if (currentTasks) router.push(`?tasks=${getArrToObjUrl()}`);
     }, [currentTasks]);
 
@@ -179,23 +176,20 @@ function Content() {
 
 function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateUpdate }: { index?: number, currentTasks: Task[], setCurrentTasks: Function, setShowCreateUpdate: Function }) {
     const handleAction = (formData: FormData) => {
-        const formTask = formData.get("task");
+        const formTask = formData.get("task") as string;
+        const formLabels = (formData.get("labels") as string).split(",").map(l => l.trim());
         let handledDays = (formData.get("days") as string).replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
 
         if (!formTask || !handledDays) return;
 
-        console.log({
-            formTask,
-        })
-
         if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));
-            copy[index] = { ...copy[index], days: handledDays, task: formTask };
+            copy[index] = { ...copy[index], days: handledDays, task: `${formTask}:${formLabels.join(":")}` };
             setCurrentTasks(copy);
         } else {
             const newTaskData = {
                 days: handledDays,
-                task: formTask,
+                task: `${formTask}:${formLabels}`,
                 done: false,
             }
             setCurrentTasks([newTaskData, ...currentTasks]);
@@ -208,7 +202,11 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
             <form action={handleAction} onClick={(e) => e.stopPropagation()} className="border p-8 text-white rounded-xl">
                 <div>
                     <label htmlFor="task" className="font-bold mb-2 block my-4">Task:</label>
-                    <input type="text" name="task" id="task" defaultValue={(index || index === 0) ? currentTasks[index].task : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
+                    <input type="text" name="task" id="task" defaultValue={(index || index === 0) ? currentTasks[index].task.split(":")[0] : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
+                </div>
+                <div>
+                    <label htmlFor="labels" className="font-bold mb-2 block my-4">Labels:</label>
+                    <input type="text" name="labels" id="labels" defaultValue={(index || index === 0) ? currentTasks[index].task.split(":").slice(1) : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
                 </div>
                 <div>
                     <label htmlFor="days" className="font-bold mb-2 block my-4">Days:</label>
