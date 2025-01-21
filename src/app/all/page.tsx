@@ -142,7 +142,6 @@ function Content() {
                                 setCurrentTasks(copy);
                             }} className="hover:scale-110" />
                         </div>
-                        {ct.done && <BsCheckCircle className="absolute top-1/2 right-4 -translate-y-1/2" />}
                     </div>
                 })
             }
