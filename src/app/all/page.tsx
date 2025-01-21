@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { BsCaretDown, BsCaretUp, BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsHouse, BsPencil, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
 import Link from 'next/link';
 
-type Task = { days: string, task: string, done: boolean };
+type Task = { frequency: string, chosenFrequency: string, task: string, done: boolean };
 
 function weekDayToNumber(weekDay: string) {
     if (weekDay == "all") return -1;
@@ -45,8 +45,8 @@ function Content() {
         if (tasks) {
             const all = tasks.split(">>");
             const allInObject = all.map(a => {
-                const [days, task, done] = a.split(";");
-                return { days: days, task, done: done == "true" };
+                const [frequency, chosenFrequency, task, done] = a.split(";");
+                return { frequency: frequency, chosenFrequency, task, done: done == "true" };
             });
             setCurrentTasks(allInObject);
         }
@@ -88,7 +88,8 @@ function Content() {
                         className="bg-gray-800 text-white p-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group"
                     >
                         {ct.task}
-                        <span className="bg-black px-2 py-1 mx-4 text-xs rounded-xl">{ct.days.split(",").map(d => numberToWeekDay(Number(d))).join(", ")}</span>
+                        <span className="bg-black px-2 py-1 mx-1 text-xs rounded-xl">{ct.frequency === "weekly" ? ct.chosenFrequency?.split(",").map(d => numberToWeekDay(Number(d))).join(", ") : ct.chosenFrequency}</span>
+                        <span className="bg-black px-2 py-1 mx-1 text-xs rounded-xl">{ct.frequency}</span>
 
                         <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 gap-2 hidden group-hover:flex">
                             {
@@ -121,8 +122,8 @@ function Content() {
                                     copy[i - 1] = copy[i];
                                     copy[i] = tmp;
                                 } else {
-                                    let tmp = copy[copy.length-1];
-                                    copy[copy.length-1] = copy[i];
+                                    let tmp = copy[copy.length - 1];
+                                    copy[copy.length - 1] = copy[i];
                                     copy[i] = tmp;
                                 }
                                 setCurrentTasks(copy);
@@ -175,21 +176,34 @@ function Content() {
 }
 
 function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateUpdate }: { index?: number, currentTasks: Task[], setCurrentTasks: Function, setShowCreateUpdate: Function }) {
+    const [selectedFrequency, setSelectedFrequency] = useState("");
     const handleAction = (formData: FormData) => {
         const formTask = formData.get("task") as string;
+        const frequency = formData.get("frequency") as string;
         const formLabels = (formData.get("labels") as string).split(",").map(l => l.trim());
-        let handledDays = (formData.get("days") as string).replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
+        let handledDays = undefined;
+        switch(frequency) {
+            case "weekly":
+                handledDays = (formData.get("chosenFrequency") as string).replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
+                break;
+            case "monthly":
+            case "yearly":
+                handledDays = formData.get("chosenFrequency") as string;
+        }
 
         if (!formTask || !handledDays) return;
 
+        console.log({formLabels});
+
         if (index || index === 0) {
             const copy = JSON.parse(JSON.stringify(currentTasks));
-            copy[index] = { ...copy[index], days: handledDays, task: `${formTask}:${formLabels.join(":")}` };
+            copy[index] = { ...copy[index], chosenFrequency: handledDays, frequency, task: formLabels.length > 0 && formLabels[0] !== "" ? `${formTask}:${formLabels.join(":")}` : formTask };
             setCurrentTasks(copy);
         } else {
             const newTaskData = {
-                days: handledDays,
-                task: `${formTask}:${formLabels}`,
+                frequency,
+                chosenFrequency: handledDays,
+                task: formLabels.length > 0 && formLabels[0] !== "" ? `${formTask}:${formLabels.join(":")}` : formTask,
                 done: false,
             }
             setCurrentTasks([newTaskData, ...currentTasks]);
@@ -209,9 +223,38 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
                     <input type="text" name="labels" id="labels" defaultValue={(index || index === 0) ? currentTasks[index].task.split(":").slice(1) : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
                 </div>
                 <div>
-                    <label htmlFor="days" className="font-bold mb-2 block my-4">Days:</label>
-                    <Combobox items={["all", "sun", "mon", "tue", "wed", "thu", "fri", "sat"]} prevSelectedItems={(index || index === 0) ? currentTasks[index].days.split(",").map(e => numberToWeekDay(Number(e))) : []} name={"days"} id={"days"} />
+                    <label className="font-bold mb-2 block my-4" htmlFor="frequency">Frequency:</label>
+                    <select className="p-4 rounded-xl bg-gray-800 w-full" name="frequency" id="frequency" onChange={(e) => setSelectedFrequency(e.target.value)}>
+                        <option value="">Select an option</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
                 </div>
+                {
+                    selectedFrequency === "weekly" && (
+                        <div>
+                            <label className="font-bold mb-2 block my-4" htmlFor="chosenFrequency">Days:</label>
+                            <Combobox items={["all", "sun", "mon", "tue", "wed", "thu", "fri", "sat"]} prevSelectedItems={(index || index === 0) ? currentTasks[index].chosenFrequency.split(",").map(e => numberToWeekDay(Number(e))) : []} name={"chosenFrequency"} id={"chosenFrequency"} />
+                        </div>
+                    )
+                }
+                {
+                    selectedFrequency === "monthly" && (
+                        <div>
+                            <label className="font-bold mb-2 block my-4" htmlFor="chosenFrequency">Day:</label>
+                            <input type="number" name="chosenFrequency" defaultValue={(index || index === 0) ? currentTasks[index].chosenFrequency : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
+                        </div>
+                    )
+                }
+                {
+                    selectedFrequency === "yearly" && (
+                        <div>
+                            <label className="font-bold mb-2 block my-4" htmlFor="chosenFrequency">Day:</label>
+                            <input type="text" name="chosenFrequency" id="chosenFrequency" defaultValue={(index || index === 0) ? currentTasks[index].chosenFrequency : ""} className="p-4 rounded-xl bg-gray-800" autoComplete={"off"} autoCorrect="off" autoCapitalize="on" />
+                        </div>
+                    )
+                }
                 <button className="w-full p-4 rounded-full bg-purple-900 text-white hover:bg-purple-800 hover:scale-95 mt-4">{(index || index === 0) ? "Atualizar" : "Criar"}</button>
             </form>
         </div>

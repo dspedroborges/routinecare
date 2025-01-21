@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react';
 import { BsCheckCircle, BsCircle, BsClipboard2, BsClipboard2Check, BsEye, BsFire, BsPencil, BsPlusCircleDotted, BsTrash, BsTrashFill } from 'react-icons/bs';
 
-type Task = { days: string, task: string, done: boolean };
+type Task = { frequency: string, chosenFrequency: string, task: string, done: boolean };
 
 export default function Home() {
   return (
@@ -30,8 +30,8 @@ function Content() {
     if (tasks) {
       const all = tasks.split(">>");
       const allInObject = all.map(a => {
-        const [days, task, done] = a.split(";");
-        return { days: days, task, done: done == "true" };
+        const [frequency, chosenFrequency, task, done] = a.split(";");
+        return { frequency, chosenFrequency, task, done: done == "true" };
       });
       setCurrentTasks(allInObject);
     } else {
@@ -83,6 +83,32 @@ function Content() {
     setCurrentTasks(copy);
   }
 
+  const verifyChosenFrequency = (task: Task) => {
+    const currentDay = new Date().getDay();
+    const currentDate = new Date().toLocaleDateString();
+    switch(task.frequency) {
+      case "weekly": {
+        if (task.chosenFrequency === "-1" || task.chosenFrequency.split(",").includes(String(currentDay))) {
+          return true;
+        }
+        break;
+      }
+      case "monthly": {
+        const split = currentDate.split("/")[0];
+        if (task.chosenFrequency === split) return true;
+        break;
+      }
+      case "yearly": {
+        let split: any = currentDate.split("/");
+        split.pop();
+        split = split.join("/");
+        if (task.chosenFrequency === split) return true;
+        break;
+      }
+    }
+    return false;
+  }
+
   return (
     <main className="p-8">
       <h1 className="text-white text-4xl text-center my-4">Routine Care</h1>
@@ -100,8 +126,8 @@ function Content() {
       </div>
       {
         currentTasks?.map((ct, i) => {
-          const currentDay = new Date().getDay();
-          if (ct.days === "-1" || ct.days.split(",").includes(String(currentDay))) {
+          
+          if (verifyChosenFrequency(ct)) {
             return <div
               key={i}
               className={`${ct.done ? "bg-purple-800" : "bg-gray-800"} text-white px-4 py-2 rounded-xl mb-2 cursor-pointer hover:brightness-125 relative group flex items-center`}
