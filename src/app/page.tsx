@@ -39,6 +39,8 @@ function Content() {
     }
     let streaks: string[] = JSON.parse(localStorage.getItem("streaks") as string) || [];
     setRegisteredStreaks(streaks);
+
+    
   }, []);
 
   const getArrToObjUrl = () => {

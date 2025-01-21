@@ -223,7 +223,7 @@ function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateU
                 </div>
                 <div>
                     <label className="font-bold mb-2 block my-4" htmlFor="frequency">Frequency:</label>
-                    <select className="p-4 rounded-xl bg-gray-800 w-full" name="frequency" id="frequency" onChange={(e) => setSelectedFrequency(e.target.value)}>
+                    <select className="p-4 rounded-xl bg-gray-800 w-full" name="frequency" id="frequency" defaultValue={(index || index === 0) ? currentTasks[index].frequency : ""}  onChange={(e) => setSelectedFrequency(e.target.value)}>
                         <option value="">Select an option</option>
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
