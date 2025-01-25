@@ -176,18 +176,29 @@ function Content() {
 
 function CreateUpdateTask({ index, currentTasks, setCurrentTasks, setShowCreateUpdate }: { index?: number, currentTasks: Task[], setCurrentTasks: Function, setShowCreateUpdate: Function }) {
     const [selectedFrequency, setSelectedFrequency] = useState("");
+
+    useEffect(() => {
+        if (index || index === 0) {
+            const frequency = currentTasks[index].frequency;
+            setSelectedFrequency(frequency);
+            console.log(frequency);
+        }
+    }, []);
+
     const handleAction = (formData: FormData) => {
         const formTask = formData.get("task") as string;
         const frequency = formData.get("frequency") as string;
         const formLabels = (formData.get("labels") as string).split(",").map(l => l.trim());
         let handledDays = undefined;
+        let chosenFrequency = formData.get("chosenFrequency") as string;
+
         switch(frequency) {
             case "weekly":
-                handledDays = (formData.get("chosenFrequency") as string).replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
+                handledDays = chosenFrequency.replaceAll(" ", "").split(",").map(d => weekDayToNumber(d)).join(",");
                 break;
             case "monthly":
             case "yearly":
-                handledDays = formData.get("chosenFrequency") as string;
+                handledDays = chosenFrequency;
         }
 
         if (!formTask || !handledDays) return;
